@@ -1,5 +1,11 @@
 {
   "devDependencies": {
-    "@types/node": "^24.10.2"
+    "@types/amqplib": "^0.10.8",
+    "@types/node": "^24.10.2",
+    "@types/pg": "^8.16.0"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.9",
+    "pg": "^8.16.3"
   }
 }
