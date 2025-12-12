@@ -13,6 +13,14 @@ export class RabbitMQ {
 
     constructor(private url: string) { }
 
+    get_channel(): Channel {
+        if (!this.ch) {
+            throw new Error("RabbitMQ channel not initialized. Call connect() first.");
+        }
+
+        return this.ch;
+    }
+    
     async connect() {
         this.conn = await amqp.connect(this.url);
         this.ch = await this.conn.createChannel();

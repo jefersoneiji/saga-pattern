@@ -14,7 +14,19 @@ export class event_handler {
         private orchestrator: { handle_event: (e: saga_event) => Promise<void>; }
     ) { }
 
-    async start_consuming(queue_name = 'orchestrator.events') {
+    async start_consuming(queue_name = 'orchestrator.events.queue') {
+        const channel = this.rabbit.get_channel();
+
+        await channel.assertExchange('orchestrator.events', 'topic', { durable: true });
+
+        await channel.assertQueue("orchestrator.events.queue", { durable: true });
+
+        await channel.bindQueue(
+            "orchestrator.events.queue",
+            "orchestrator.events",
+            "saga.reply.#"
+        );
+
         await this.rabbit.consume(queue_name, async (msg: ConsumeMessage) => {
             const correlation_id = msg.properties.correlationId as string | undefined;
             if (!correlation_id) {
@@ -22,17 +34,17 @@ export class event_handler {
                 return;
             }
 
-            const routing_key = (msg.fields as any).routing_key as string;
+            const routing_key = msg.fields.routingKey;
             const body = JSON.parse(msg.content.toString());
 
             const is_success = this._is_success_routing_key(routing_key, body);
-
             const event: saga_event = {
                 saga_id: correlation_id,
                 type: routing_key,
                 success: is_success,
                 payload: body
             };
+            console.log('EVENT IN EVENT HANDLER IS: ', event);
             await this.orchestrator.handle_event(event);
         });
     }

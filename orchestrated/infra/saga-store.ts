@@ -22,8 +22,8 @@ export class saga_store {
 
         await this.pool.query(
             `INSERT INTO sagas(id, type, step_index, status, data, created_at, updated_at)
-         VALUES($1,$2,$3,$4,$5,$6)`,
-            [id, type, step_index, status, data, now]
+            VALUES($1,$2,$3,$4,$5,$6,$7)`,
+            [id, type, step_index, status, data, now, now]
         );
 
         return {
@@ -56,9 +56,10 @@ export class saga_store {
     async update_step(id: string, step_index: number, new_data?: Record<string, any>): Promise<void> {
         const now = new Date().toISOString();
         await this.pool.query(
-            `UPDATE sagas SET step_index = $2, data = COALESCE(data || #3::jsonb, $3::jsonb), updated_at = $4 WHERE id = $1`,
+            `UPDATE sagas SET step_index = $2, data = COALESCE(data || $3::jsonb, $3::jsonb), updated_at = $4 WHERE id = $1`,
             [id, step_index, JSON.stringify(new_data || {}), now]
         );
+        console.log('SAGA IN UPDATE STEP: ', new_data)
     }
 
     async mark_completed(id: string): Promise<void> {
