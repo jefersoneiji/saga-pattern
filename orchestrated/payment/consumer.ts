@@ -10,21 +10,21 @@ amqp.connect('amqp://localhost', (err, conn) => {
             throw e;
         }
 
-        const exchange = 'inventory';
+        const exchange = 'payment';
         channel.assertExchange(exchange, 'topic', { durable: true });
-        channel.assertQueue('commands.inventory', { durable: true });
-        channel.bindQueue('commands.inventory', 'inventory', 'inventory.reserve');
+        channel.assertQueue('commands.payment', { durable: true });
+        channel.bindQueue('commands.payment', 'payment', 'payment.charge');
 
-        channel.consume('commands.inventory', async msg => {
+        channel.consume('commands.payment', async msg => {
             const raw = msg?.content.toString();
             const command = JSON.parse(raw);
-            console.log('[Inventory] Received command: ', command);
+            console.log('[Payment] Received command: ', command);
 
             channel.ack(msg!);
 
             channel.publish(
                 'orchestrator.events',
-                'saga.reply.inventory.success',
+                'saga.reply.payment.success',
                 Buffer.from(
                     JSON.stringify({
                         order_id: '12645',
@@ -34,7 +34,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
                     })),
                 {
                     correlationId: msg?.properties.correlationId as any,
-                    type: 'reserve_product'
+                    type: 'process_payment'
                 }
             );
         });

@@ -3,6 +3,7 @@ import { RabbitMQ } from '../rabbitmq';
 
 export interface saga_event {
     saga_id: string;
+    name: string,
     type: string;
     success: string;
     payload: any;
@@ -41,10 +42,11 @@ export class event_handler {
             const event: saga_event = {
                 saga_id: correlation_id,
                 type: routing_key,
+                name: msg.properties.type, 
                 success: is_success,
                 payload: body
             };
-            console.log('EVENT IN EVENT HANDLER IS: ', event);
+            // console.log('EVENT IN EVENT HANDLER IS: ', event);
             await this.orchestrator.handle_event(event);
         });
     }

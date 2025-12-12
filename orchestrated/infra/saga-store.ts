@@ -59,7 +59,6 @@ export class saga_store {
             `UPDATE sagas SET step_index = $2, data = COALESCE(data || $3::jsonb, $3::jsonb), updated_at = $4 WHERE id = $1`,
             [id, step_index, JSON.stringify(new_data || {}), now]
         );
-        console.log('SAGA IN UPDATE STEP: ', new_data)
     }
 
     async mark_completed(id: string): Promise<void> {
