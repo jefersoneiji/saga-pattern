@@ -4,13 +4,21 @@ interface saga {
 
 export interface step {
     name: string;
-    command: (saga: saga) => ({ exchange: string, routing_key: string, payload: any; });
+    command: (saga: saga) => ({
+        exchange: string,
+        routing_key: string,
+        payload: any;
+    });
     on_success: string;
     on_failure: string;
 }
 
 interface compensations {
-    [index: string]: (saga: saga) => ({ exchange: string, routing_key: string, payload: any; });
+    [index: string]: (saga: saga) => ({
+        exchange: string,
+        routing_key: string,
+        payload: any; next: string;
+    });
 }
 
 export interface saga_definition {
@@ -84,21 +92,24 @@ export const order_saga_definition: saga_definition = {
             payload: {
                 product_id: saga.data.product_id,
                 quantity: saga.data.quantity
-            }
+            },
+            next: "compensate_completed"
         }),
         compensate_refund_payment: saga => ({
             exchange: "payment",
             routing_key: "payment.refund",
             payload: {
                 order_id: saga.data.order_id,
-            }
+            },
+            next: "compensate_release_product"
         }),
         compensate_revoke_invoice: saga => ({
             exchange: "billing",
             routing_key: "invoice.revoke",
             payload: {
                 invoice_id: saga.data.invoice_id,
-            }
+            },
+            next: "compensate_refund_payment"
         })
     }
 };

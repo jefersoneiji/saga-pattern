@@ -19,18 +19,18 @@ export class saga_orchestrator {
     async start(def: saga_definition, data: any) {
         const id = crypto.randomUUID();
         const saga = await this.store.create(def.name, id, data);
-        // console.log('SAGA RESULT FROM START IS: ', saga);
+
         await this.execute_step(saga, def.steps[0]);
         return { saga_id: id };
     }
 
     async handle_event(event: saga_event) {
-        // console.log('HANDLING EVENT: ', event);
         const first_saga = await this.store.get(event.saga_id);
         if (!first_saga) throw new Error("Saga not found");
 
         const def = sagas[first_saga.type];
         if (!def) throw new Error(`Unknown saga type: ${first_saga.type}`);
+        console.log('EVENT IN HANDLE EVENT IS: ', event);
 
         const step = def.steps.find(elem => elem.name === event.name)!;
 
@@ -39,30 +39,50 @@ export class saga_orchestrator {
             await this.move_to_step({ id: event.saga_id, data: event.payload }, next_step_name, def);
         } else {
             const fail_step = step.on_failure;
+            console.log('GOT INSIDE COMPENSATION INSIDE HANDLE_EVENT: ', step);
             await this.execute_compensation({ id: event.saga_id, data: event.payload }, fail_step, def);
         }
     }
+
+    async handle_compensation_event(event: saga_event) {
+        const first_saga = await this.store.get(event.saga_id);
+        if (!first_saga) throw new Error('Saga not found');
+
+        const def = sagas[first_saga.type];
+        if (!def) throw new Error(`Unknown saga type: ${first_saga.type}`);
+
+        const compensation = def.compensations[`${event.name}`];
+        if (!compensation) throw new Error(`Compensation not found for: ${event.name}`);
+        
+        const next_compensation = compensation({ data: event.payload }).next;
+        await this.execute_compensation({ data: event.payload, id: event.saga_id }, next_compensation, def);
+    }
+    // VALIDATE COMPENSATION
+    // MAKE SURE LATEST STEP DATA IS STORED 
+    // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
+    // CLOSE CONNECTION IN CONSUMERS
+    // CREATE PUBLISHERS IN MICRO-SERVICES
+    // REVIEW IMPLEMENTATION
 
     private async move_to_step(saga: { data: any, id: string; }, next_step_name: string, def: saga_definition) {
         if (next_step_name === "complete_saga") {
             console.log('EVENT MARKED COMPLETE: ', saga);
             return this.store.mark_completed(saga.id);
         }
-        // console.log('SAGA IN MOVE_TO_STEP IS: ', saga);
 
         const next_step = def.steps.find((s: { name: string; }) => s.name === next_step_name);
         const next_step_index = def.steps.findIndex((s: { name: string; }) => s.name === next_step_name);
-        console.log('Next step is: ', next_step, " next step index is: ", next_step_index);
-        // console.log('SAGA IN NEXT STEP IS: ', next_step, "\n NEXT STEP NAME IS: ", next_step_name);
+        // console.log('Next step is: ', next_step, " next step index is: ", next_step_index);
+        console.log(" next step index is: ", next_step_index);
+
         if (!next_step) throw new Error('Next step is undefined');
-        // INDEX MEANS STEP INDEX NOT DATABASE INDEX
         await this.store.update_step(saga.id, next_step_index, saga.data);
         await this.execute_step(saga, next_step);
     }
 
     private async execute_step(saga: { data: any; id: string; }, step: step) {
         const command = step.command(saga);
-        // console.log('COMMAND IS: ', command, "\n STEP IS: ", step);
+        console.log('EXECUTE STEP IS: ', command);
         await this.bus.publish(
             command.exchange,
             command.routing_key,
@@ -72,8 +92,10 @@ export class saga_orchestrator {
     }
 
     private async execute_compensation(saga: { data: any; id: string; }, compensation_name: string, def: saga_definition) {
+        // DO NOT EXECUTE REGULAR SAGA OBJECT BUT COMPENSATIONS OBJECT RATHER
         const comp = def.compensations[compensation_name];
         const cmd = comp(saga);
+        console.log('COMPENSATION USED IS: ', cmd);
         await this.bus.publish(
             cmd.exchange,
             cmd.routing_key,
@@ -81,6 +103,7 @@ export class saga_orchestrator {
             { correlation_id: saga.id }
         );
 
+        // ONLY MARK AS COMPENSATED IN THE LAST ONE WHICH IS compensate_completed
         await this.store.mark_compensated(saga.id);
     }
 }

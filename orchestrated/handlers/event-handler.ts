@@ -12,7 +12,7 @@ export interface saga_event {
 export class event_handler {
     constructor(
         private rabbit: RabbitMQ,
-        private orchestrator: { handle_event: (e: saga_event) => Promise<void>; }
+        private orchestrator: { handle_event: (e: saga_event) => Promise<void>; handle_compensation_event: (e: saga_event) => Promise<void>; }
     ) { }
 
     async start_consuming(queue_name = 'orchestrator.events.queue') {
@@ -42,11 +42,18 @@ export class event_handler {
             const event: saga_event = {
                 saga_id: correlation_id,
                 type: routing_key,
-                name: msg.properties.type, 
+                name: msg.properties.type,
                 success: is_success,
                 payload: body
             };
-            // console.log('EVENT IN EVENT HANDLER IS: ', event);
+
+            if (routing_key.includes('.compensate')) {
+                console.log('EVENT IS: ', event);
+                console.log('ROUTING KEY IS: ', routing_key);
+                this.orchestrator.handle_compensation_event(event);
+                return;
+            }
+
             await this.orchestrator.handle_event(event);
         });
     }

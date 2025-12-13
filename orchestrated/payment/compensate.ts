@@ -10,31 +10,31 @@ amqp.connect('amqp://localhost', (err, conn) => {
             throw e;
         }
 
-        const exchange = 'shipping';
+        const exchange = 'payment';
         channel.assertExchange(exchange, 'topic', { durable: true });
-        channel.assertQueue('commands.shipping', { durable: true });
-        channel.bindQueue('commands.shipping', 'shipping', 'shipping.ship');
+        channel.assertQueue('commands.payment', { durable: true });
+        channel.bindQueue('commands.payment', 'payment', 'payment.refund');
 
-        channel.consume('commands.shipping', async msg => {
+        channel.consume('commands.payment', async msg => {
             const raw = msg?.content.toString();
             const command = JSON.parse(raw!);
-            console.log('[Shipping] Received command: ', command);
+            console.log('[Payment] Received command: ', command);
 
             channel.ack(msg!);
 
             channel.publish(
                 'orchestrator.events',
-                'saga.reply.shipping.failed',
+                'saga.reply.compensate.payment',
                 Buffer.from(
                     JSON.stringify({
                         order_id: '12645',
                         amount: 10,
                         user_id: '1564ga',
-                        success: false
+                        success: true
                     })),
                 {
                     correlationId: msg?.properties.correlationId as any,
-                    type: 'ship_product'
+                    type: 'compensate_refund_payment'
                 }
             );
         });
