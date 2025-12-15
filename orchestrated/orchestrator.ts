@@ -53,8 +53,12 @@ export class saga_orchestrator {
 
         const compensation = def.compensations[`${event.name}`];
         if (!compensation) throw new Error(`Compensation not found for: ${event.name}`);
-        
+
         const next_compensation = compensation({ data: event.payload }).next;
+        if (next_compensation === "compensate_completed") {
+            await this.store.mark_compensated(event.saga_id);
+            return;
+        }
         await this.execute_compensation({ data: event.payload, id: event.saga_id }, next_compensation, def);
     }
     // VALIDATE COMPENSATION
@@ -104,7 +108,7 @@ export class saga_orchestrator {
         );
 
         // ONLY MARK AS COMPENSATED IN THE LAST ONE WHICH IS compensate_completed
-        await this.store.mark_compensated(saga.id);
+        // await this.store.mark_compensated(saga.id);
     }
 }
 

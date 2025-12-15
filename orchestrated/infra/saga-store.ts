@@ -68,7 +68,7 @@ export class saga_store {
 
     async mark_compensated(id: string): Promise<void> {
         const now = new Date().toISOString();
-        await this.pool.query(`UPDATE sagas SET status = $2, updated_at = $3 WHERE id = $1`, [id, 'compensating', now]);
+        await this.pool.query(`UPDATE sagas SET status = $2, updated_at = $3 WHERE id = $1`, [id, 'compensated', now]);
     }
 
     async fail(id: string, reason?: string): Promise<void> {
