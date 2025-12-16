@@ -59,7 +59,7 @@ export class saga_orchestrator {
         }
         await this.execute_compensation({ data: event.payload, id: event.saga_id }, next_compensation, def);
     }
-    // FIX LOGIC FOR WHEN A SAGA EVENT PROCESSED IS A SUCCESS OR FAILURE
+
     // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
     // CLOSE CONNECTION IN CONSUMERS
     // CREATE PUBLISHERS IN MICRO-SERVICES
@@ -111,11 +111,9 @@ const pool = new Pool({
 const saga_store = new saga_store_class(pool);
 const rabbitmq = new RabbitMQ('amqp://localhost');
 await rabbitmq.connect();
-await rabbitmq.ensure_exchange('inventory', 'topic');
-await rabbitmq.ensure_exchange('payment', 'topic');
-await rabbitmq.ensure_exchange('billing', 'topic');
-await rabbitmq.ensure_exchange('shipping', 'topic');
-await rabbitmq.ensure_exchange('orchestrator.events', 'topic');
+
+const exchanges = ['inventory', 'payment', 'billing', 'shipping', 'orchestrator.events'];
+await rabbitmq.ensure_exchanges(exchanges);
 
 const orchestrator = new saga_orchestrator(saga_store as any, rabbitmq);
 

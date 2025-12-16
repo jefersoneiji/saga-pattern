@@ -23,7 +23,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             const command = JSON.parse(raw!);
             console.log('[Inventory] Received command: ', command);
 
-            channel.ack(msg!);
+            channel.ack(msg);
 
             channel.publish(
                 'orchestrator.events',

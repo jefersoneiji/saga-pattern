@@ -20,7 +20,7 @@ export class RabbitMQ {
 
         return this.ch;
     }
-    
+
     async connect() {
         this.conn = await amqp.connect(this.url);
         this.ch = await this.conn.createChannel();
@@ -29,6 +29,12 @@ export class RabbitMQ {
     async ensure_exchange(exchange: string, type: 'direct' | 'topic' | 'fanout' = 'direct') {
         if (!this.ch) throw new Error('Not connected');
         await this.ch.assertExchange(exchange, type, { durable: true });
+    }
+
+    async ensure_exchanges(exchanges: Array<string>): Promise<void> {
+        for (const exchange of exchanges) {
+            await this.ensure_exchange(exchange, 'topic');
+        }
     }
 
     async publish(exchange: string, routing_key: string, payload: any, opts: PublishOptions = {}) {

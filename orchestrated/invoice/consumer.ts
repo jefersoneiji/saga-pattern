@@ -21,7 +21,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         channel.consume(queue, async msg => {
             const raw = msg?.content.toString();
             const command = JSON.parse(raw!);
-            console.log('[Billing] Received command: ', command);
+            console.log('[Invoice] Received command: ', command);
 
             channel.ack(msg!);
 

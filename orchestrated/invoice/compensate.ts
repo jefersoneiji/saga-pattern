@@ -12,7 +12,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
 
         const exchange = 'billing';
         const routing_key = 'invoice.revoke';
-        const queue = 'commands.billing';
+        const queue = 'compensate.billing';
 
         channel.assertExchange(exchange, 'topic', { durable: true });
         channel.assertQueue(queue, { durable: true });
@@ -31,7 +31,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
                 Buffer.from(
                     JSON.stringify({
                         order_id: '12645',
-                        amount: 10,
+                        amount: 35,
                         user_id: '1564ga',
                         success: true
                     })),

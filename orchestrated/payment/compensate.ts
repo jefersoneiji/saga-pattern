@@ -12,7 +12,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
 
         const exchange = 'payment';
         const routing_key = 'payment.refund';
-        const queue = 'commands.payment';
+        const queue = 'compensate.payment';
 
         channel.assertExchange(exchange, 'topic', { durable: true });
         channel.assertQueue(queue, { durable: true });

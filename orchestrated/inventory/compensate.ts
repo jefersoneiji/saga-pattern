@@ -12,7 +12,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
 
         const exchange = 'inventory';
         const routing_key = 'inventory.release';
-        const queue = 'commands.inventory';
+        const queue = 'compensate.inventory';
 
         channel.assertExchange(exchange, 'topic', { durable: true });
         channel.assertQueue(queue, { durable: true });
@@ -23,7 +23,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             const command = JSON.parse(raw!);
             console.log('[Inventory] Received command: ', command);
 
-            channel.ack(msg!);
+            channel.ack(msg);
 
             channel.publish(
                 'orchestrator.events',
