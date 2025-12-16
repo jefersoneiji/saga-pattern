@@ -30,7 +30,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
                         order_id: '12645',
                         amount: 10,
                         user_id: '1564ga',
-                        success: false
+                        success: true
                     })),
                 {
                     correlationId: msg?.properties.correlationId as any,

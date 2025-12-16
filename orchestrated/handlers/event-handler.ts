@@ -48,8 +48,6 @@ export class event_handler {
             };
 
             if (routing_key.includes('.compensate')) {
-                // console.log('EVENT IS: ', event);
-                console.log('ROUTING KEY IS: ', routing_key);
                 this.orchestrator.handle_compensation_event(event);
                 return;
             }
