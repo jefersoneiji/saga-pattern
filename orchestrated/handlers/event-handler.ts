@@ -16,17 +16,14 @@ export class event_handler {
     ) { }
 
     async start_consuming(queue_name = 'orchestrator.events.queue') {
+        const routing_key = "saga.reply.#";
+        const exchange = "orchestrator.events";
+
         const channel = this.rabbit.get_channel();
 
         await channel.assertExchange('orchestrator.events', 'topic', { durable: true });
-
         await channel.assertQueue("orchestrator.events.queue", { durable: true });
-
-        await channel.bindQueue(
-            "orchestrator.events.queue",
-            "orchestrator.events",
-            "saga.reply.#"
-        );
+        await channel.bindQueue("orchestrator.events.queue", exchange, routing_key);
 
         await this.rabbit.consume(queue_name, async (msg: ConsumeMessage) => {
             const correlation_id = msg.properties.correlationId as string | undefined;
@@ -47,12 +44,13 @@ export class event_handler {
                 payload: body
             };
 
-            if (routing_key.includes('.compensate')) {
-                this.orchestrator.handle_compensation_event(event);
-                return;
+            if (routing_key.includes(".compensate")) {
+                await this.orchestrator.handle_compensation_event(event);
             }
 
-            await this.orchestrator.handle_event(event);
+            if (!routing_key.includes(".compensate")) {
+                await this.orchestrator.handle_event(event);
+            }
         });
     }
 

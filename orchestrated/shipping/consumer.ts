@@ -11,11 +11,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         }
 
         const exchange = 'shipping';
-        channel.assertExchange(exchange, 'topic', { durable: true });
-        channel.assertQueue('commands.shipping', { durable: true });
-        channel.bindQueue('commands.shipping', 'shipping', 'shipping.ship');
+        const routing_key = 'shipping.ship';
+        const queue = 'commands.shipping';
 
-        channel.consume('commands.shipping', async msg => {
+        channel.assertExchange(exchange, 'topic', { durable: true });
+        channel.assertQueue(queue, { durable: true });
+        channel.bindQueue(queue, exchange, routing_key);
+
+        channel.consume(queue, async msg => {
             const raw = msg?.content.toString();
             const command = JSON.parse(raw!);
             console.log('[Shipping] Received command: ', command);
@@ -24,7 +27,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
 
             channel.publish(
                 'orchestrator.events',
-                'saga.reply.shipping.failed',
+                'saga.reply.shipping.success',
                 Buffer.from(
                     JSON.stringify({
                         order_id: '12645',

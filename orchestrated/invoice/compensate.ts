@@ -11,11 +11,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         }
 
         const exchange = 'billing';
-        channel.assertExchange(exchange, 'topic', { durable: true });
-        channel.assertQueue('commands.billing', { durable: true });
-        channel.bindQueue('commands.billing', 'billing', 'invoice.revoke');
+        const routing_key = 'invoice.revoke';
+        const queue = 'commands.billing';
 
-        channel.consume('commands.billing', async msg => {
+        channel.assertExchange(exchange, 'topic', { durable: true });
+        channel.assertQueue(queue, { durable: true });
+        channel.bindQueue(queue, exchange, routing_key);
+
+        channel.consume(queue, async msg => {
             const raw = msg?.content.toString();
             const command = JSON.parse(raw!);
             console.log('[Invoice] Received command: ', command);

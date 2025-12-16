@@ -11,11 +11,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         }
 
         const exchange = 'payment';
-        channel.assertExchange(exchange, 'topic', { durable: true });
-        channel.assertQueue('commands.payment', { durable: true });
-        channel.bindQueue('commands.payment', 'payment', 'payment.refund');
+        const routing_key = 'payment.refund';
+        const queue = 'commands.payment';
 
-        channel.consume('commands.payment', async msg => {
+        channel.assertExchange(exchange, 'topic', { durable: true });
+        channel.assertQueue(queue, { durable: true });
+        channel.bindQueue(queue, exchange, routing_key);
+
+        channel.consume(queue, async msg => {
             const raw = msg?.content.toString();
             const command = JSON.parse(raw!);
             console.log('[Payment] Received command: ', command);
