@@ -58,6 +58,7 @@ export interface saga_event {
 export interface interface_orchestrator {
     handle_event: (e: saga_event) => Promise<void>;
     handle_compensation_event: (e: saga_event) => Promise<void>;
+    start: (def: saga_definition, data: any) => Promise<{ saga_id: string; }>;
 }
 
 export interface publish_options {

@@ -1,6 +1,5 @@
 import { interface_saga_store, saga_definition, interface_step, saga_event } from "../microservices/interfaces";
 import { saga_store as saga_store_class } from "./infra/saga-store";
-import { order_saga_definition } from "./sagas/order-saga";
 import { event_handler } from "./handlers/event-handler";
 import { RabbitMQ } from './rabbitmq';
 import { sagas } from "./sagas";
@@ -55,9 +54,7 @@ export class saga_orchestrator {
         }
     }
 
-    // DOCKERIZE APPLICATION
-    // HOW TO INITIATE ORCHESTRATOR FROM A MICROSERVICE
-    // CREATE PUBLISHERS IN MICRO-SERVICES
+    // REFACTOR EXCHANGES AND QUEUES NAMES
     // REVIEW IMPLEMENTATION
 
     private async move_to_step(saga: { data: any, id: string; }, next_step_name: string, def: saga_definition) {
@@ -114,11 +111,6 @@ const orchestrator = new saga_orchestrator(saga_store as any, rabbitmq);
 
 const events = new event_handler(rabbitmq, orchestrator);
 await events.start_consuming("orchestrator.events.queue");
+await events.start_consuming_commands("orchestrator.commands.queue");
 
-const order = {
-    product_id: "9ec2f934-7e7b-4772-bdbe-f14a492af1d1",
-};
-orchestrator
-    .start(order_saga_definition, order)
-    .then(res => console.log('RES FROM START IS: ', res))
-    .catch(err => console.error('ERROR FROM START IS: ', err));
+console.debug(`[${new Date().toISOString()}] Orchestrator started!`);
