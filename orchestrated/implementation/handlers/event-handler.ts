@@ -1,18 +1,12 @@
 import { ConsumeMessage } from 'amqplib';
-import { RabbitMQ } from '../rabbitmq';
 
-export interface saga_event {
-    saga_id: string;
-    name: string,
-    type: string;
-    success: string;
-    payload: any;
-}
+import { interface_orchestrator, saga_event } from '../../microservices/interfaces';
+import { RabbitMQ } from '../rabbitmq';
 
 export class event_handler {
     constructor(
         private rabbit: RabbitMQ,
-        private orchestrator: { handle_event: (e: saga_event) => Promise<void>; handle_compensation_event: (e: saga_event) => Promise<void>; }
+        private orchestrator: interface_orchestrator
     ) { }
 
     async start_consuming(queue_name = 'orchestrator.events.queue') {

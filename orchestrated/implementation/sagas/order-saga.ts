@@ -1,32 +1,4 @@
-interface saga {
-    data: any;
-}
-
-export interface step {
-    name: string;
-    command: (saga: saga) => ({
-        exchange: string,
-        routing_key: string,
-        payload: any;
-    });
-    on_success: string;
-    on_failure: string;
-}
-
-interface compensations {
-    [index: string]: (saga: saga) => ({
-        exchange: string,
-        routing_key: string,
-        payload: any; next: string;
-    });
-}
-
-export interface saga_definition {
-    name: string;
-    steps: Array<step>;
-    compensations: compensations;
-}
-
+import { saga_definition } from "../../microservices/interfaces";
 
 export const order_saga_definition: saga_definition = {
     name: "order_saga",

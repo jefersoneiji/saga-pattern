@@ -1,18 +1,7 @@
 import { Pool } from 'pg';
+import { interface_saga_store, saga_state, saga_status } from '../../microservices/interfaces';
 
-export type saga_status = 'pending' | 'running' | 'completed' | 'failed' | 'compensating';
-
-export interface saga_state {
-    id: string;
-    type: string;
-    step_index: number;
-    status: saga_status;
-    data: Record<string, any>;
-    created_at: string;
-    updated_at: string;
-}
-
-export class saga_store {
+export class saga_store implements interface_saga_store {
     constructor(private pool: Pool) { }
 
     async create(type: string, id: string, data: Record<string, any>): Promise<saga_state> {

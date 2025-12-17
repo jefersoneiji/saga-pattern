@@ -1,17 +1,11 @@
-import { order_saga_definition, saga_definition, step } from "./sagas/order-saga";
-import { RabbitMQ } from './rabbitmq';
-import { event_handler, saga_event } from "./handlers/event-handler";
-import { sagas } from "./sagas";
+import { interface_saga_store, saga_definition, interface_step, saga_event } from "../microservices/interfaces";
 import { saga_store as saga_store_class } from "./infra/saga-store";
-import { Pool } from "pg";
+import { order_saga_definition } from "./sagas/order-saga";
+import { event_handler } from "./handlers/event-handler";
+import { RabbitMQ } from './rabbitmq';
+import { sagas } from "./sagas";
 
-export interface interface_saga_store {
-    create(name: string, type: string, data: any): Promise<any>;
-    get(id: string): Promise<{ type: string, step_index: number; }>;
-    mark_completed(id: string): Promise<any>;
-    update_step(id: string, next_step_index: number, new_data?: Record<string, any>): Promise<any>;
-    mark_compensated(id: string): Promise<any>;
-}
+import { Pool } from "pg";
 
 export class saga_orchestrator {
     constructor(private store: interface_saga_store, private bus: RabbitMQ) { }
@@ -30,7 +24,6 @@ export class saga_orchestrator {
 
         const def = sagas[first_saga.type];
         if (!def) throw new Error(`Unknown saga type: ${first_saga.type}`);
-
         const step = def.steps.find(elem => elem.name === event.name)!;
 
         if (event.success) {
@@ -48,7 +41,7 @@ export class saga_orchestrator {
 
         const def = sagas[first_saga.type];
         if (!def) throw new Error(`Unknown saga type: ${first_saga.type}`);
-
+        def;
         const compensation = def.compensations[`${event.name}`];
         if (!compensation) throw new Error(`Compensation not found for: ${event.name}`);
 
@@ -62,9 +55,9 @@ export class saga_orchestrator {
         }
     }
 
+    // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
     // DOCKERIZE APPLICATION
     // HOW TO INITIATE ORCHESTRATOR FROM A MICROSERVICE
-    // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
     // CREATE PUBLISHERS IN MICRO-SERVICES
     // REVIEW IMPLEMENTATION
 
@@ -81,7 +74,7 @@ export class saga_orchestrator {
         await this.execute_step(saga, next_step);
     }
 
-    private async execute_step(saga: { data: any; id: string; }, step: step) {
+    private async execute_step(saga: { data: any; id: string; }, step: interface_step) {
         const command = step.command(saga);
         await this.bus.publish(
             command.exchange,

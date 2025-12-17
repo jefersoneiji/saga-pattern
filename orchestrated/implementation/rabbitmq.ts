@@ -1,11 +1,6 @@
 import amqp, { ChannelModel, Channel, Options, ConsumeMessage } from 'amqplib';
 
-export interface PublishOptions {
-    correlation_id?: string,
-    reply_to?: string,
-    persistent?: boolean,
-    expiration_ms?: number;
-}
+import { publish_options } from '../microservices/interfaces';
 
 export class RabbitMQ {
     private conn?: ChannelModel;
@@ -37,7 +32,7 @@ export class RabbitMQ {
         }
     }
 
-    async publish(exchange: string, routing_key: string, payload: any, opts: PublishOptions = {}) {
+    async publish(exchange: string, routing_key: string, payload: any, opts: publish_options = {}) {
         if (!this.ch) throw new Error('Not connected');
         const content = Buffer.from(JSON.stringify(payload));
         const options: Options.Publish = {
