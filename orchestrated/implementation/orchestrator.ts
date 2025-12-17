@@ -62,7 +62,8 @@ export class saga_orchestrator {
         }
     }
 
-    // TEST PAYLOAD VALUES IN BETWEEN SAGA STEPS
+    // DOCKERIZE APPLICATION
+    // HOW TO INITIATE ORCHESTRATOR FROM A MICROSERVICE
     // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
     // CREATE PUBLISHERS IN MICRO-SERVICES
     // REVIEW IMPLEMENTATION
@@ -123,12 +124,7 @@ const events = new event_handler(rabbitmq, orchestrator);
 await events.start_consuming("orchestrator.events.queue");
 
 const order = {
-    order_id: '123456',
-    user_id: '5465465adf',
-    product_id: "54654ag",
-    quantity: 50,
-    amount: 30,
-    address: "5th Avenue, New York, New York, USA"
+    product_id: "9ec2f934-7e7b-4772-bdbe-f14a492af1d1",
 };
 orchestrator
     .start(order_saga_definition, order)

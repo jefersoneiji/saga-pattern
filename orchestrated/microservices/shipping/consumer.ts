@@ -27,12 +27,11 @@ amqp.connect('amqp://localhost', (err, conn) => {
 
             channel.publish(
                 'orchestrator.events',
-                'saga.reply.shipping.failed',
+                'saga.reply.shipping.success',
                 Buffer.from(
                     JSON.stringify({
-                        order_id: '12645',
-                        amount: 10,
-                        user_id: '1564ga',
+                        shipping_id: "da01c8b5-2e32-4805-a1f2-8d633014908c",
+                        order_id: "816c64e0-60ac-4a4e-bfa6-ca18914df0ed",
                         success: true
                     })),
                 {

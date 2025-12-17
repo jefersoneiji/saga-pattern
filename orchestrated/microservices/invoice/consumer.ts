@@ -9,7 +9,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         if (e) {
             throw e;
         }
-       
+
         const exchange = 'billing';
         const routing_key = 'invoice.generate';
         const queue = 'commands.billing';
@@ -30,9 +30,8 @@ amqp.connect('amqp://localhost', (err, conn) => {
                 'saga.reply.billing.success',
                 Buffer.from(
                     JSON.stringify({
-                        order_id: '12645',
-                        amount: 10,
-                        user_id: '1564ga',
+                        order_id: "816c64e0-60ac-4a4e-bfa6-ca18914df0ed",
+                        address: '5th Avenue, New York, NY, USA',
                         success: true
                     })),
                 {

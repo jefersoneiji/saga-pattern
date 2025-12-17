@@ -30,9 +30,8 @@ amqp.connect('amqp://localhost', (err, conn) => {
                 'saga.reply.payment.success',
                 Buffer.from(
                     JSON.stringify({
-                        order_id: '12645',
-                        amount: 10,
-                        user_id: '1564ga',
+                        order_id: "816c64e0-60ac-4a4e-bfa6-ca18914df0ed",
+                        user_id: "6942bd701485b0c89623f19e",
                         success: true
                     })),
                 {
