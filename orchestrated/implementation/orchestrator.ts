@@ -55,13 +55,15 @@ export class saga_orchestrator {
         const next_compensation = compensation({ data: event.payload }).next;
         if (next_compensation === "compensate_completed") {
             await this.store.mark_compensated(event.saga_id);
-            return;
         }
-        await this.execute_compensation({ data: event.payload, id: event.saga_id }, next_compensation, def);
+
+        if (next_compensation !== "compensate_completed") {
+            await this.execute_compensation({ data: event.payload, id: event.saga_id }, next_compensation, def);
+        }
     }
 
+    // TEST PAYLOAD VALUES IN BETWEEN SAGA STEPS
     // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
-    // CLOSE CONNECTION IN CONSUMERS
     // CREATE PUBLISHERS IN MICRO-SERVICES
     // REVIEW IMPLEMENTATION
 
