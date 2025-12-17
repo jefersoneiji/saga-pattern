@@ -55,7 +55,6 @@ export class saga_orchestrator {
         }
     }
 
-    // STANDARDIZE INTERFACES ACROSS FUNCTIONS/CLASSES
     // DOCKERIZE APPLICATION
     // HOW TO INITIATE ORCHESTRATOR FROM A MICROSERVICE
     // CREATE PUBLISHERS IN MICRO-SERVICES
@@ -97,15 +96,15 @@ export class saga_orchestrator {
 }
 
 const pool = new Pool({
-    user: "postgres",
-    password: "typebot",
-    host: "localhost",
-    port: 5432,
-    database: "sagas"
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+    host: process.env.PG_HOST,
+    port: process.env.PG_PORT as unknown as number,
+    database: process.env.PG_DATABASE
 });
 
 const saga_store = new saga_store_class(pool);
-const rabbitmq = new RabbitMQ('amqp://localhost');
+const rabbitmq = new RabbitMQ(process.env.RABBITMQ_URL!);
 await rabbitmq.connect();
 
 const exchanges = ['inventory', 'payment', 'billing', 'shipping', 'orchestrator.events'];

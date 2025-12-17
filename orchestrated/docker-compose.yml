@@ -27,6 +27,20 @@ services:
       PGADMIN_DEFAULT_PASSWORD: "pgadmin21."
     depends_on:
       - postgres
+  
+  orchestrator: 
+    build:
+      context: ./implementation
+      dockerfile: dockerfile
+    command: bun ./orchestrator.ts
+    environment:
+      PG_HOST: postgres
+      PG_USER: postgres
+      PG_PASSWORD: typebot
+      PG_PORT: 5432
+      PG_DATABASE: sagas
+      RABBITMQ_URL: amqp://rabbitmq
+
 
 volumes: 
   rabbitmq_data:
