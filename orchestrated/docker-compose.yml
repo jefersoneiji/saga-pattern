@@ -32,7 +32,7 @@ services:
     build:
       context: ./implementation
       dockerfile: dockerfile
-    command: pnpm start
+    command: node ./dist/main.js
     environment:
       PG_HOST: postgres
       PG_USER: postgres

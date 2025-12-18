@@ -54,9 +54,6 @@ export class saga_orchestrator {
         }
     }
 
-    // REFACTOR EXCHANGES AND QUEUES NAMES
-    // REVIEW IMPLEMENTATION
-
     private async move_to_step(saga: { data: any, id: string; }, next_step_name: string, def: saga_definition) {
         if (next_step_name === "complete_saga") {
             return this.store.mark_completed(saga.id);
