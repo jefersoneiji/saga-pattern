@@ -1,4 +1,4 @@
-import { saga_definition } from "../../microservices/interfaces";
+import { saga_definition } from "../interfaces";
 import { order_saga_definition  } from "./order-saga";
 
 export const sagas: Record<string, saga_definition> = {

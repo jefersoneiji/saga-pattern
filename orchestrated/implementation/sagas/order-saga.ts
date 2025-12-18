@@ -1,4 +1,4 @@
-import { saga_definition } from "../../microservices/interfaces";
+import { saga_definition } from "../interfaces";
 
 export const order_saga_definition: saga_definition = {
     name: "order_saga",

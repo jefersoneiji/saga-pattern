@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { interface_saga_store, saga_state, saga_status } from '../../microservices/interfaces';
+import { interface_saga_store, saga_state, saga_status } from '../interfaces';
 
 export class saga_store implements interface_saga_store {
     constructor(private pool: Pool) { }

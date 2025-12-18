@@ -1,6 +1,6 @@
 import amqp, { ChannelModel, Channel, Options, ConsumeMessage } from 'amqplib';
 
-import { publish_options } from '../microservices/interfaces';
+import { publish_options } from './interfaces';
 
 export class RabbitMQ {
     private conn?: ChannelModel;

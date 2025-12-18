@@ -1,4 +1,4 @@
-import { interface_saga_store, saga_definition, interface_step, saga_event } from "../microservices/interfaces";
+import { interface_saga_store, saga_definition, interface_step, saga_event } from "./interfaces";
 import { saga_store as saga_store_class } from "./infra/saga-store";
 import { event_handler } from "./handlers/event-handler";
 import { RabbitMQ } from './rabbitmq';

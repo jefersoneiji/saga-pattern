@@ -1,6 +1,6 @@
 import { ConsumeMessage } from 'amqplib';
 
-import { interface_orchestrator, saga_event } from '../../microservices/interfaces';
+import { interface_orchestrator, saga_event } from '../interfaces';
 import { RabbitMQ } from '../rabbitmq';
 import { order_saga_definition } from '../sagas/order-saga';
 
