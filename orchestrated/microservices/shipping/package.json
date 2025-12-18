@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "bun --env-file=.env.development consumer.ts",
-    "start": "bun consumer.ts"
+    "start": "bun consumer.ts",
+    "build": "rspack build",
+    "preview": "rspack preview"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,8 @@
     "amqplib": "^0.10.9"
   },
   "devDependencies": {
+    "@rspack/cli": "^1.6.8",
+    "@rspack/core": "^1.6.8",
     "@types/amqplib": "^0.10.8",
     "@types/node": "^25.0.3"
   }

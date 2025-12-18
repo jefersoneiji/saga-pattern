@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "bun --env-file=.env.development listeners.ts",
-    "start": "bun orchestrator.ts",
+    "start": "bun listeners.ts",
     "build": "rspack build",
     "preview": "rspack preview"
   },
