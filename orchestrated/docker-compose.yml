@@ -53,6 +53,17 @@ services:
     depends_on:
       - rabbitmq
       - orchestrator
+  
+  invoice:
+    build:
+      context: ./microservices/invoice
+      dockerfile: dockerfile
+    command: pnpm start
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+      - orchestrator
 
 volumes: 
   rabbitmq_data:
