@@ -1,6 +1,12 @@
 import amqp from 'amqplib/callback_api';
 
-amqp.connect('amqp://localhost', (err, conn) => {
+if (!process.env.RABBITMQ_URL) {
+    throw Error('RABBITMQ_URL is missing.');
+};
+
+const rabbit_url = process.env.RABBITMQ_URL;
+
+amqp.connect(rabbit_url, (err, conn) => {
     if (err) {
         throw err;
     }
@@ -9,6 +15,8 @@ amqp.connect('amqp://localhost', (err, conn) => {
         if (e) {
             throw e;
         }
+
+        console.debug(`[${new Date().toISOString()}] Shipping started!`);
 
         const exchange = 'shipping';
         const routing_key = 'shipping.ship';
