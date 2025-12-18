@@ -69,7 +69,7 @@ services:
     build:
       context: ./microservices/payment
       dockerfile: dockerfile
-    command: pnpm start
+    command: node ./dist/main.js
     environment:
       RABBITMQ_URL: amqp://rabbitmq
     depends_on:
