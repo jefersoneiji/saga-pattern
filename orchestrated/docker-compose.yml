@@ -32,7 +32,7 @@ services:
     build:
       context: ./implementation
       dockerfile: dockerfile
-    command: bun ./orchestrator.ts
+    command: pnpm start
     environment:
       PG_HOST: postgres
       PG_USER: postgres
@@ -40,7 +40,19 @@ services:
       PG_PORT: 5432
       PG_DATABASE: sagas
       RABBITMQ_URL: amqp://rabbitmq
-
+    depends_on:
+      - rabbitmq
+  
+  inventory:
+    build:
+      context: ./microservices/inventory
+      dockerfile: dockerfile
+    command: pnpm start
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq
+    depends_on:
+      - rabbitmq
+      - orchestrator
 
 volumes: 
   rabbitmq_data:

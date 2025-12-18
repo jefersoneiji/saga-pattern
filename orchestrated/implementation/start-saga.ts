@@ -32,5 +32,10 @@ amqp.connect('amqp://localhost', (err, conn) => {
                 type: 'START_ORDER_SAGA'
             }
         );
+        
+        setTimeout(() => {
+            conn.close();
+            process.exit(0);
+        }, 500);
     });
 });
